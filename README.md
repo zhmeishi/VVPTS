@@ -1,7 +1,7 @@
 # VVPTS
 
 ## Before you use this code, you should know
-	1. This code was used for the empirical study of the VLDB'2019 paper 
+	1. This code was used for the empirical study of the VLDB'2019 paper submitted 
 	   "Velocity Vector Preserving Trajectory Simplification".
 	2. This code is developed by Guanzhi WANG and Zhenmei SHI (gwangaj / zshiad @connect.ust.hk).
 	3. This code is written in C++.
