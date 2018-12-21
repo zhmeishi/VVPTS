@@ -1,0 +1,1 @@
+./data/Geolife/000.txt 20000 0.1 1 1 6 1 stat.txt
