@@ -72,9 +72,12 @@ The running statistics are stored in "stat.txt" which format is explained in App
 	3. <The compression ratio>
 	4. <The running time (in sec)>
 	5. <The memory usage (in MB)>
+
 	If Error Check:
-	6. <Velocity Error>
-	7. <Distance Error>
-	8. <Direction Error>
-	9. <CED Error>
-	10.<SED Error>
+	6. <Velocity Min>
+	7. <Velocity Max>
+	8. <Velocity Error>
+	9. <Distance Error>
+	10.<Direction Error>
+	11.<CED Error>
+	12.<SED Error>
