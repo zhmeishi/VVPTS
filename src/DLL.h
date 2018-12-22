@@ -209,6 +209,7 @@ class DLL
                     //printf("R is not in disk %d\n", j);
                     isPoint = false;
                     update = false;
+                    empty = true;
                 }
                 return;
             }

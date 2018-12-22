@@ -11,8 +11,7 @@
 
 #include <algorithm>
 #include <iostream>
-#include "Const.h"
-extern emp_stat_t* emp_stat_v;
+ extern emp_stat_t* emp_stat_v;
 /* AVL node */
 template <class T>
 class AVLnode {

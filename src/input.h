@@ -49,11 +49,23 @@ public:
         {
             config->line_ignore_n = max(6,config->line_ignore_n);
             emp_read_data_v1( config);
+            //config->eps = config->eps * scale;
         }
-        else
+        else if( config->dataset_tag == 2)
         {
             //config->line_ignore_n = 0;
             emp_read_data_v2( config);
+            //config->eps = config->eps * scale;
+        }
+        else if( config->dataset_tag == 3)
+        {
+            config->line_ignore_n = max(1,config->line_ignore_n);
+            emp_read_data_v3( config);
+        }
+        else
+        {
+            cout<<"Invalid Dataset option\n";
+            exit(0);
         }
     }
    
@@ -79,7 +91,7 @@ public:
         fscanf( c_fp, "%i", &emp_config_v->check);
         fscanf( c_fp, "%s", &emp_config_v->s_name);
         //cout<< emp_config_v->f_name;
-
+        fclose(c_fp);
         return emp_config_v;
     }
   
@@ -119,6 +131,7 @@ public:
         time_init.tm_min = 0;
         time_init.tm_sec = 0;
         t1 = mktime(&time_init);
+        double time_m = 0;
 
         //Read the positions.
         for( i=0; i<emp_config_v->pos_n; i++)
@@ -215,19 +228,23 @@ public:
             double t = difftime ( t2, t1 );
             //cout<<t2<<" "<<t1<<endl;
                         
-            if( t - prev_t < -0.1 ){
-                fprintf( stderr, "Time decrease. The trajectory is invalid. \n");
-                exit( 0);
-            }
-            
-            //cout<<x - pre_x<<","<<y - pre_y<<","<<t<<"\n";
             if( fabs( t - prev_t) <= Const::EPSILION )
-            t += 0.01;
+            t += 0.5;
+
+            if( t - prev_t < 0.5 ){
+                //fprintf( stderr, "Time decrease. The trajectory is invalid. \n");
+                //exit( 0);
+                time_m += 5;
+            }
+            else{
+                time_m += t - prev_t;
+            }
             prev_t = t;
             pre_x = x;
             pre_y = y;
-            tra_list_v[i+1]=Point(x,y,t,i+1);
-        }        
+            tra_list_v[i+1]=Point(x,y,time_m,i+1);
+        }    
+        fclose(i_fp);    
     }
 
     /*
@@ -265,6 +282,7 @@ public:
         time_init.tm_min = 0;
         time_init.tm_sec = 0;
         t1 = mktime(&time_init);
+        double time_m=0;
 
         //Read the positions.
         for( i=0; i<emp_config_v->pos_n; i++)
@@ -356,24 +374,128 @@ public:
             double y = atof( tok)*scale;
             if( fabs( x - pre_x) <= Const::EPSILION &&
             fabs( y - pre_y) <= Const::EPSILION)
-            x += 10000*Const::EPSILION;
-            
-            if( t - prev_t < -0.1 ){
-                fprintf( stderr, "Time decrease. The trajectory is invalid.\n");
-                exit( 0);
-            }
-
+            x += 100*Const::EPSILION;
             if( fabs( t - prev_t) <= Const::EPSILION )
             t += 0.5;
+
+            if( t - prev_t < 0.5 ){
+                //fprintf( stderr, "Time decrease. The trajectory is invalid. \n");
+                //exit( 0);
+                time_m += 5;
+            }
+            else{
+                time_m += t - prev_t;
+            }
+
             prev_t = t;
 
             //cout<<x - pre_x<<","<<y - pre_y<<","<<t<<"\n";
             pre_x = x;
             pre_y = y;
 
-            tra_list_v[i+1]=Point(x,y,t,i+1);
-        }    
+            tra_list_v[i+1]=Point(x,y,time_m,i+1);
+        } 
+        fclose(i_fp);   
     }
+
+    /*
+    *    Specific to the Radio data.
+    */
+    void emp_read_data_v3( emp_config_t* emp_config_v)
+    {
+        int i;
+        char tmp[ MAX_LINE_LENG];
+        char* tok;
+        double pre_x = 0.0;
+        double pre_y = 0.0;
+        double prev_t = 0.0;
+        double time_m = 0;
+
+        FILE* i_fp;
+
+        if( ( i_fp = fopen( emp_config_v->f_name, "r")) == NULL)
+        {
+            fprintf( stderr, "Cannot open the data file.\n");
+            exit( 0);
+        }
+
+        //Filter the useless lines if necessary.
+        for( i=0; i<emp_config_v->line_ignore_n; i++)
+        {
+            fgets( tmp, MAX_LINE_LENG, i_fp);
+        }
+
+        //Read the positions.
+        for( i=0; i<emp_config_v->pos_n; i++)
+        {
+            //Read the line.
+            fgets( tmp, MAX_LINE_LENG, i_fp);
+
+            //Parse the line to get the x and y coordinates.
+            //useless.
+            if( !(tok = strtok( tmp, ",")))
+            {
+                fprintf( stderr, "Data format inconsistency.\n");
+                exit( 0);
+            }
+
+            //x
+            if( !(tok = strtok( NULL, ",")))
+            {
+                fprintf( stderr, "Data format inconsistency.\n");
+                exit( 0);
+            }
+            double x = atof( tok);
+
+            //y
+            if( !(tok = strtok( NULL, ",")))
+            {
+                fprintf( stderr, "Data format inconsistency.\n");
+                exit( 0);
+            }
+
+            double y = atof( tok);
+            if( fabs( x - pre_x) <= Const::EPSILION &&
+                fabs( y - pre_y) <= Const::EPSILION)
+                x += 100*Const::EPSILION;
+
+            //useless.
+            if( !(tok = strtok( NULL, ",")))
+            {
+                fprintf( stderr, "Data format inconsistency.\n");
+                exit( 0);
+            }
+
+            //time.
+            if( !(tok = strtok( NULL, ",")))
+            {
+                fprintf( stderr, "Data format inconsistency.\n");
+                exit( 0);
+            }
+            double t = atoi( tok);
+
+            if( fabs( t - prev_t) <= Const::EPSILION )
+            t += 0.5;
+
+            if( t - prev_t < 0.5 ){
+                //fprintf( stderr, "Time decrease. The trajectory is invalid. \n");
+                //exit( 0);
+                time_m += 5;
+            }
+            else{
+                time_m += t - prev_t;
+            }
+            prev_t = t;
+
+            //cout<<x - pre_x<<","<<y - pre_y<<","<<t<<"\n";
+            pre_x = x;
+            pre_y = y;
+
+            tra_list_v[i+1]=Point(x,y,time_m,i+1);
+        }    
+        fclose(i_fp);
+    }
+    
 
 };
 

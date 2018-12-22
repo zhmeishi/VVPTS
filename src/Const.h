@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <limits>
 #include <sys/time.h>
 #include <sys/resource.h>
 using namespace std;
@@ -21,9 +22,12 @@ using namespace std;
 
 struct traInfo_t
 {
-    double v_max;
-    double d_max;
-    double t_max;
+    double      v_max;
+    double      d_max;
+    double      t_max;
+    double      v_min;
+    double      d_min;
+    double      t_min;
 };
 
 typedef struct emp_stat
@@ -54,12 +58,12 @@ struct emp_config_t
 
     //problem specific.
     double   eps;            //for the Min-Size problem
-    int     W;              //for the Min-Error problem
+    int      W;              //for the Min-Error problem
     double   W_percent;    
 
-    int     alg_opt;        //algorithm specific.
-    int     dataset_tag;    //appr_bound tag  
-    int     check;          //ErrorCheck  
+    int      alg_opt;        //algorithm specific.
+    int      dataset_tag;    //appr_bound tag  
+    int      check;          //ErrorCheck  
 };
 
 class Const 
@@ -67,12 +71,10 @@ class Const
 
 public:
     static constexpr double PI = 3.14159265;
+
     static constexpr double EPSILION = 0.00002;
-    // static constexpr double EPSILION = 0.0000000001;
     static constexpr double EPSILION_ANGLE = 0.00005;
-    // static constexpr double EPSILION_CIRCLE = 0.000001;
-    //static constexpr double EPSILION = 0.00000000001;
-    //static constexpr double EPSILION_ANGLE = 0.000001;
+
     static constexpr double ZOOM = 10000;
     static double error;
     // static constexpr double ZOOM = 1000000;
@@ -528,6 +530,10 @@ public:
         result->d_max = 0;
         result->t_max = 0;
         result->v_max = 0;
+        result->d_min = std::numeric_limits<double>::max();
+        result->t_min = std::numeric_limits<double>::max();
+        result->v_min = std::numeric_limits<double>::max();
+
         for (int k = 1; k < length; k++)
         {   
             double d = Const::L2norm( tra[k+1].x_coo-tra[k].x_coo, tra[k+1].y_coo-tra[k].y_coo);
@@ -535,6 +541,9 @@ public:
             result->d_max = max(result->d_max, d);
             result->t_max = max(result->t_max, t);
             result->v_max = max(result->v_max, d/t);
+            result->d_min = min(result->d_min, d);
+            result->t_min = min(result->t_min, t);
+            result->v_min = min(result->v_min, d/t);
         }
         return result;
     }

@@ -180,6 +180,7 @@ class Experiment
         //Statistics.
         fprintf( s_fp, "%lf\n%lf\n\n", emp_stat_v->r_time, emp_stat_v->memory_max / (1024 * 1024));
         if(input->config->check!=0){
+            fprintf( s_fp, "%lf\n%lf\n\n", traInfo->v_min, traInfo->v_max);
             fprintf( s_fp, "%lf\n%lf\n%lf\n%lf\n%lf\n", emp_stat_v->ve, emp_stat_v->diste, 
             emp_stat_v->direce, emp_stat_v->cede, emp_stat_v->sede);
         }
