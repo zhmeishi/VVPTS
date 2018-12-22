@@ -19,5 +19,6 @@ int main(int argv, char **args)
     Experiment exp(config);
     exp.run();
     exp.~Experiment();
+    exit(0);
     return 0;
 }

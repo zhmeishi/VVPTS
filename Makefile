@@ -1,3 +1,2 @@
-
-VVPTS:
-	g++ -std=c++11 -o VVPTS ./src/main.cpp
+VVPTS:	./src/*.h	./src/*.cpp
+	g++	-std=c++11	./src/*.h	./src/*.cpp	-o	VVPTS
