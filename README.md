@@ -45,7 +45,7 @@ The running statistics are stored in "stat.txt" which format is explained in App
 	= 0: the Sanity     Optimal	    O(N^3)      O(N^2)
 	= 1: the VVPTS      Optimal	    O(N^2*logN) O(N)
 	= 2: the Heuristic  Approximate     O(N)        O(N)
-	= 3: the Split 	    Approximate     O(N*logN)   O(N)
+	= 3: the Split 	    Approximate     O(N^2)      O(N)
 	= 4: the Merge      Approximate     O(N^2)      O(N)
 	= 5: the Greedy     Approximate     O(N^2)      O(N)
 
